@@ -1,57 +1,33 @@
-# Professor Bot — Telegram Strategy Assistant
+# 🎯 El Profesor — Mindset Trainer
 
-Money Heist ke **Professor** jaisa strategic thinking assistant.
-Jo bhi socho — organize kare, plan banaye, backup plans ready rakhe.
+**Personal strategic mindset coach** — Money Heist ke Professor ki tarah sochna sikho!
 
-## Setup (2 minute)
+## 🚀 Deployed
 
-### 1. Telegram Bot Token lo
-- Telegram mein **@BotFather** search karo
-- `/newbot` bhejo
-- Bot ka naam do (jaise: `Professor Strategy Bot`)
-- Username do (jaise: `@yourname_professor_bot`)
-- Jo token mile woh copy karo
+**App:** https://profesor-ai.vercel.app  
+**GitHub:** https://github.com/TAUSHEF/profesor-bot
 
-### 2. OpenAI API Key lo (optional)
-- https://platform.openai.com/api-keys se API key lo
+## 🔧 LLM Setup (Mandatory for AI replies)
 
-### 3. Run karo
-CMD mein yeh likho:
+Vercel dashboard mein **PROFESSOR_API_KEY** daalo:
 
-```cmd
-cd C:\ProfessorBot
+1. https://vercel.com/TAUSHEF/profesor-ai/settings/environment-variables
+2. Add → Key: `PROFESSOR_API_KEY`
+3. Value: Apna OpenRouter ya OpenAI API key
+4. Redeploy: **Deployments** → 3 dots → **Redeploy**
 
-pip install python-telegram-bot openai
+**Free options:**
+- **OpenRouter:** https://openrouter.ai/keys — free credits, `gpt-4o-mini` model
+- **OpenAI:** https://platform.openai.com/api-keys
 
-set PROFESSOR_BOT_TOKEN=apna_token_yahan_daalo
-set OPENAI_API_KEY=apna_api_key_yahan_daalo
-python bot.py
-```
+## 📱 Mobile Use
 
-Ya chahte ho toh seedha `config.py` khol ke wahan values daal do — dono line 13-14 pe.
+Phone pe browser kholo → `profesor-ai.vercel.app` → **Add to Home Screen**
 
-### Commands
-
-| Command | Kaam |
-|---------|------|
-| `/start` | Professor se milo |
-| `/think` | Koi thought organize karo |
-| `/plan` | Strategic plan banayein |
-| `/analyze` | Situation ka deep analysis |
-| `/brainstorm` | Ideas generate karo |
-| `/contingency` | Backup plans (Plan B, C, D) |
-| `/stats` | Progress dekho |
-| `/clear` | Naye safar ki shuruaat |
-
-Ya bas **direct message** karo — normally baat karo jaise kisi dost se!
-
-## Files
-
-```
-C:\ProfessorBot\
-├── bot.py          # Main bot
-├── config.py       # Settings + API keys
-├── memory.py       # Chat history
-├── requirements.txt
-└── README.md
-```
+### Features
+- 📱 PWA — installable on phone home screen
+- 🧠 8 training modules (Strategic Thinking → Master Plan)
+- 💬 Free Chat — Professor se kuch bhi poochho
+- 🌐 Web Intel — internet search during training
+- ⬆️ XP + Level system
+- 💾 Progress auto-saves in browser
