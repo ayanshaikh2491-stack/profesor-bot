@@ -1,0 +1,15 @@
+# El Profesor — Render Deployment Config
+# Push this repo to GitHub and connect to Render
+
+services:
+  - type: web
+    name: profesor-ai
+    runtime: python
+    repo: https://github.com/TAUSHEF/profesor-bot
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: python serve.py
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0

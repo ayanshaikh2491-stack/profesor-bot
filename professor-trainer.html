@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎯 El Profesor — Mindset Trainer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#e0e0e0;min-height:100vh}
+  
+  /* Professor Theme */
+  .bg-pattern{position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,#1a1a2e 0%,transparent 50%),radial-gradient(ellipse at 80% 50%,#16213e 0%,transparent 50%);z-index:-1}
+  .bg-pattern::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none}
+
+  /* Header */
+  .header{background:linear-gradient(135deg,#0f0f1a 0%,#1a1a2e 100%);border-bottom:1px solid rgba(255,215,0,0.2);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo-icon{font-size:28px}
+  .logo-text{font-size:18px;font-weight:800;background:linear-gradient(135deg,#ffd700,#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .logo-sub{font-size:11px;color:#888;font-weight:500;letter-spacing:1px;text-transform:uppercase}
+  .stats-bar{display:flex;gap:16px;font-size:13px}
+  .stat-item{text-align:center}
+  .stat-value{color:#ffd700;font-weight:700;font-size:16px}
+  .stat-label{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:0.5px}
+
+  /* Main */
+  .container{max-width:900px;margin:0 auto;padding:20px}
+
+  /* Phase Progress */
+  .phase-progress{background:linear-gradient(135deg,#12121f,#1a1a2e);border-radius:16px;padding:20px;margin-bottom:20px;border:1px solid rgba(255,215,0,0.1)}
+  .phase-title{font-size:13px;color:#ffd700;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px}
+  .phase-name{font-size:20px;font-weight:700;margin-bottom:12px}
+  .level-bar{height:6px;background:#222;border-radius:3px;overflow:hidden;margin-bottom:8px}
+  .level-fill{height:100%;background:linear-gradient(90deg,#ffd700,#ffaa00);border-radius:3px;transition:width 0.5s;width:0%}
+  .level-text{font-size:12px;color:#888;display:flex;justify-content:space-between}
+
+  /* Chat / Lesson Area */
+  .chat-area{background:linear-gradient(135deg,#12121f,#1a1a2e);border-radius:16px;border:1px solid rgba(255,215,0,0.1);overflow:hidden;min-height:400px;display:flex;flex-direction:column}
+  .chat-header{background:rgba(255,215,0,0.05);padding:14px 20px;border-bottom:1px solid rgba(255,215,0,0.1);display:flex;justify-content:space-between;align-items:center}
+  .chat-title{font-weight:600;font-size:14px}
+  .chat-title span{color:#ffd700}
+  .chat-messages{padding:20px;flex:1;overflow-y:auto;max-height:450px;min-height:300px}
+  .message{margin-bottom:16px;animation:msgIn 0.3s ease}
+  @keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .msg-prof{display:flex;gap:12px;align-items:flex-start}
+  .msg-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ffd700,#b8860b);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  .msg-bubble{background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.15);border-radius:12px 12px 12px 4px;padding:12px 16px;max-width:85%;line-height:1.6;font-size:14px}
+  .msg-bubble strong{color:#ffd700}
+  .msg-user{display:flex;gap:12px;flex-direction:row-reverse;align-items:flex-start}
+  .msg-user .msg-avatar{background:linear-gradient(135deg,#444,#666)}
+  .msg-user .msg-bubble{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);border-radius:12px 12px 4px 12px}
+
+  /* Options */
+  .options-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+  .option-btn{background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2);color:#ddd;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-family:inherit;transition:all 0.2s;text-align:left}
+  .option-btn:hover{background:rgba(255,215,0,0.15);border-color:#ffd700;transform:translateY(-1px);color:#fff}
+  .option-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+
+  /* Input Area */
+  .chat-input{display:flex;gap:10px;padding:14px 20px;border-top:1px solid rgba(255,215,0,0.1);background:rgba(0,0,0,0.3)}
+  .chat-input input{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 14px;color:#fff;font-size:14px;font-family:inherit;outline:none;transition:border 0.2s}
+  .chat-input input:focus{border-color:#ffd700}
+  .chat-input input::placeholder{color:#555}
+  .chat-input button{background:linear-gradient(135deg,#ffd700,#b8860b);border:none;color:#0a0a0f;padding:10px 20px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;transition:all 0.2s;font-family:inherit}
+  .chat-input button:hover{transform:scale(1.02);box-shadow:0 4px 20px rgba(255,215,0,0.3)}
+  .chat-input button:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+
+  /* Framework Cards */
+  .framework-card{background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:16px;margin-bottom:12px}
+  .framework-card h4{color:#ffd700;margin-bottom:6px;font-size:15px}
+  .framework-card p{font-size:13px;color:#bbb;line-height:1.5}
+
+  /* Typing indicator */
+  .typing-indicator{display:none;align-items:center;gap:8px;padding:8px 20px}
+  .typing-indicator.active{display:flex}
+  .typing-dots{display:flex;gap:4px}
+  .typing-dots span{width:8px;height:8px;border-radius:50%;background:#ffd700;animation:typing 1.4s infinite}
+  .typing-dots span:nth-child(2){animation-delay:0.2s}
+  .typing-dots span:nth-child(3){animation-delay:0.4s}
+  @keyframes typing{0%,60%,100%{opacity:0.3;transform:scale(0.8)}30%{opacity:1;transform:scale(1)}}
+
+  /* Sidebar / Module Selector */
+  .module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:20px}
+  .module-btn{background:linear-gradient(135deg,#12121f,#1a1a2e);border:1px solid rgba(255,215,0,0.1);border-radius:12px;padding:14px;cursor:pointer;transition:all 0.2s;text-align:left;font-family:inherit;color:#ddd}
+  .module-btn:hover{border-color:#ffd700;transform:translateY(-2px);box-shadow:0 4px 20px rgba(255,215,0,0.1)}
+  .module-btn.active{border-color:#ffd700;background:rgba(255,215,0,0.08)}
+  .module-btn .icon{font-size:24px;margin-bottom:6px;display:block}
+  .module-btn .name{font-weight:600;font-size:13px}
+  .module-btn .desc{font-size:11px;color:#666;margin-top:4px}
+
+  /* Reset button */
+  .reset-btn{background:rgba(255,0,0,0.1);border:1px solid rgba(255,0,0,0.2);color:#ff6b6b;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit;transition:all 0.2s}
+  .reset-btn:hover{background:rgba(255,0,0,0.2)}
+
+  /* Responsive */
+  @media(max-width:600px){
+    .header{flex-wrap:wrap;gap:10px;padding:12px}
+    .logo-text{font-size:15px}
+    .stats-bar{gap:10px}
+    .options-grid{grid-template-columns:1fr}
+    .module-grid{grid-template-columns:1fr 1fr}
+    .chat-messages{max-height:300px;min-height:200px}
+  }
+</style>
+</head>
+<body>
+<div class="bg-pattern"></div>
+
+<!-- Header -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">🎯</div>
+    <div>
+      <div class="logo-text">El Profesor</div>
+      <div class="logo-sub">Mindset Trainer</div>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-value" id="levelDisplay">1</div>
+      <div class="stat-label">Level</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="xpDisplay">0</div>
+      <div class="stat-label">XP</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="phaseDisplay">1</div>
+      <div class="stat-label">Phase</div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <!-- Phase Progress -->
+  <div class="phase-progress">
+    <div class="phase-title">Current Mission</div>
+    <div class="phase-name" id="phaseName">Phase 1: Strategic Foundation</div>
+    <div class="level-bar"><div class="level-fill" id="xpFill" style="width:0%"></div></div>
+    <div class="level-text"><span id="phaseDetail">0 / 5 lessons</span><span id="xpNeeded">100 XP to next level</span></div>
+  </div>
+
+  <!-- Module Selector -->
+  <div class="module-grid" id="moduleGrid"></div>
+
+  <!-- Chat / Training Area -->
+  <div class="chat-area">
+    <div class="chat-header">
+      <div class="chat-title">🧠 <span>Professor</span> — Training Session</div>
+      <button class="reset-btn" onclick="resetProgress()">↻ Reset</button>
+    </div>
+    <div class="typing-indicator" id="typingIndicator">
+      <span style="font-size:12px;color:#888">Professor is thinking</span>
+      <div class="typing-dots"><span></span><span></span><span></span></div>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Apna jawab likho..." onkeydown="if(event.key==='Enter')sendMessage()">
+      <button id="sendBtn" onclick="sendMessage()">Bhejo →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  PROFESSOR MINDSET TRAINER — Full App
+// ============================================================
+
+// === TRAINING MODULES ===
+const MODULES = [
+  { id:'strategic-thinking', icon:'🧠', name:'Strategic Thinking', desc:'10 steps ahead sochna seekho', phase:1 },
+  { id:'contingency', icon:'🔄', name:'Contingency Planning', desc:'Plan B, C, D ready karna', phase:1 },
+  { id:'psychology', icon:'🎭', name:'Psychological Ops', desc:'Logon ko samajhna aur influence karna', phase:2 },
+  { id:'observation', icon:'🔍', name:'Observation & Intel', desc:'Hidden details dekhna seekho', phase:2 },
+  { id:'decision-making', icon:'⚡', name:'Decision Making', desc:'Pressure mein sahi decision lena', phase:2 },
+  { id:'leadership', icon:'👑', name:'Leadership & Team', desc:'Team ko coordinate karna', phase:3 },
+  { id:'patience', icon:'⏳', name:'Patience & Timing', desc:'Sahi waqt ka wait karna', phase:3 },
+  { id:'master-plan', icon:'🎯', name:'Master Planning', desc:'Poori operation ka blueprint', phase:3 },
+];
+
+// === LESSONS ===
+const LESSONS = {
+  'strategic-thinking': [
+    {
+      title: '10 Steps Ahead',
+      professor: 'Bhai, Professor aur common aadmi mein farak kya hai?\n\nCommon aadmi 1-2 step aage sochta hai. Professor 10 steps aage sochta hai.\n\nJab woh Mint mein ghus raha tha, tabhi usne soch liya tha:\n- Kya hoga agar police aa gayi? (Step 3)\n- Kya hoga agar andar koi revolt kare? (Step 5)\n- Kya hoga agar plan leak ho jaye? (Step 8)\n\n*Rule:* Har decision ke baad pooch — "Agar yeh fail ho jaye toh?"',
+      exercise: 'Scenario: Tum ek business shuru kar rahe ho. 5 steps aage ka plan banao.\n\nStep 1: Business register karo\nStep 2: Product banao\nStep 3: ?\nStep 4: ?\nStep 5: ?\n\nAur har step ka backup kya hoga?',
+      check: (answer) => answer.length > 20
+    },
+    {
+      title: 'Chess, Not Checkers',
+      professor: 'Professor hamesha chess khelta hai — checkers nahi.\n\nCheckers mein bas agla move sochte ho. Chess mein poori game ka pattern sochte ho.\n\n*Professor ka method:*\n1. Objective clear karo (kya chahte ho?)\n2. Resources identify karo (kya hai tere paas?)\n3. Timeline banao (kab kya hoga?)\n4. Risks identify karo (kya galat ho sakta hai?)\n5. Contingencies ready karo (Plan B kya hai?)',
+      exercise: 'Apni current life ki ek problem lo. Upar ke 5 steps apply karo aur likho.\n\nProblem kya hai?\nObjective?\nResources?\nTimeline?\nRisks?\nPlan B?',
+      check: (answer) => answer.length > 30
+    },
+    {
+      title: 'Multiple Perspectives',
+      professor: 'Professor har situation ko 4 angles se dekhta hai:\n\n1. *Apna angle* — main kya chahta hoon?\n2. *Dushman ka angle* — woh kya chahte hain?\n3. *Audience ka angle* — bahar wale kya dekhenge?\n4. *Hidden angle* — ground reality kya hai?\n\nJab tu koi bhi decision le — pehle yeh 4 angles nikaal. Phir decision le.',
+      exercise: 'Soch ki tere dost ne tujhe dhoka diya. 4 angles se analyze karo:\n\nApna angle:\nUska angle:\nBahar walon ka angle:\nHidden angle:',
+      check: (answer) => answer.length > 30
+    },
+    {
+      title: 'Information Asymmetry',
+      professor: 'Professor ka sabse powerful weapon — information.\n\nWoh jaanta hai jo doosra nahi jaanta. Aur woh chhupata hai jo doosre ko nahi jaanna chahiye.\n\n*Rule:*\n- Jo tu jaanta hai, uska 80% apne paas rakh\n- Sirf 20% doosron ko bata\n- Har baat ka time aur place hota hai\n\nTujhe kya pata hai jo doosron ko nahi pata? Use apna advantage bana.',
+      exercise: 'Apni current situation mein — kya information hai tere paas jo doosron ko nahi? Isko kaise use kar sakta hai?',
+      check: (answer) => answer.length > 20
+    },
+    {
+      title: 'Endgame Visualization',
+      professor: 'Professor har operation ka end pehle se dekh leta hai.\n\nWoh jaanta hai ki final scene kaisa hoga — phir uss final scene se reverse-engineer karta hai.\n\n*Try this:*\n1. 1 saal baad apni perfect life imagine kar\n2. Ab reverse mein soch — aaj se shuru karke wahaan tak kaise pahunchoge\n3. Har milestone likh\n\nYeh hai Professor ka secret — pehle end dekho, phir start karo.',
+      exercise: 'Visualize karo: 1 saal baad tu exactly kya achieve karna chahta hai? Reverse engineer karo aur 5 milestones likho.',
+      check: (answer) => answer.length > 30
+    }
+  ],
+  'contingency': [
+    {
+      title: 'Plan B Mindset',
+      professor: 'Professor kabhi ek plan pe rely nahi karta.\n\nJab woh Plan A bana raha hota hai — tabhi uske dimaag mein Plan B, C aur D bhi ready hote hain.\n\n*Golden Rule:* Har plan ka ek "Agar yeh fail ho jaye toh" version hona chahiye.\n\nAaj ek cheez soch — jo tera main plan hai. Ab uska Plan B, C, D bana.',
+      exercise: 'Tera ek important plan kya hai abhi? Uske 3 backup plans bana:\n\nPlan A (main):\nPlan B (agar A fail ho):\nPlan C (agar B bhi fail ho):\nPlan D (emergency exit):',
+      check: (answer) => answer.length > 40
+    },
+    {
+      title: 'Risk Assessment',
+      professor: 'Professor har scenario ka risk pehle calculate karta hai:\n\n*Risk Matrix:*\n├ High Probability + High Impact → TURANT PLAN B chahiye\n├ High Probability + Low Impact → Monitor karo\n├ Low Probability + High Impact → Emergency plan ready\n└ Low Probability + Low Impact → Ignore\n\nHar decision se pehle yeh matrix banao. Phir confidence aayega.',
+      exercise: 'Apne kisi ek decision ko risk matrix mein dalo:\n\nDecision:\nProbability (Low/Medium/High):\nImpact (Low/Medium/High):\nKaunsa quadrant aaya?\nKya action lena chahiye?',
+      check: (answer) => answer.length > 30
+    }
+  ],
+  'psychology': [
+    {
+      title: 'Reading People',
+      professor: 'Professor logon ko aise padhta hai jaise kitaab.\n\n*Key signals:*\n- Kya bol rahe hain vs kya nahi bol rahe\n- Body language kya keh rahi hai\n- Unka fear kya hai? Greed kya hai?\n\n*Rule:* Har aadmi ka ek weak point hota hai. Pata kar lo.\n\nTum apne aas-paas ke logon ko kitna jaante ho?',
+      exercise: 'Apne ek close friend/colleague ke baare mein socho:\n\nUnka fear kya hai?\nUnki motivation kya hai?\nKaunsa topic unhe trigger karta hai?\nKaise manipulate/convince kar sakte ho?',
+      check: (answer) => answer.length > 30
+    },
+    {
+      title: 'Controlling the Narrative',
+      professor: 'Professor hamesha narrative control karta hai.\n\nJab police uske baare mein kuch sochti hai — woh pehle se waisa hi scene bana chuka hota hai.\n\n*Technique:*\n├ Information leak karo jo tum chahte ho ki log soche\n├ Fake tracks banao (distractions)\n├ Timing perfect rakho — sahi waqt par sahi baat\n\nTum logon ko kya sochna chahoge? Uske liye aaj se narrative build karo.',
+      exercise: 'Tumhari life mein ek situation hai jahan log galat soch rahe hain tumhare baare mein. Kaise narrative change karoge? Kya steps honge?',
+      check: (answer) => answer.length > 30
+    }
+  ],
+  'observation': [
+    {
+      title: 'Details Matter',
+      professor: 'Professor har chhoti detail notice karta hai.\n\nWoh jaanta hai ki — "Devil is in the details."\n\nEk chhoti si chook poori operation fail kar sakti hai.\n\n*Aaj ka exercise:*\n- Jis room mein ho, 10 cheezein notice karo jo normally ignore karte ho\n- Logo ki aadatien observe karo\n- Patterns dhoondo\n\nProfessor banne ka pehla step — observe karna seekho.',
+      exercise: 'Apne aas paas ki 5 cheezein likho jo normally tum ignore karte ho. Ab socho — inka kya significance ho sakta hai?',
+      check: (answer) => answer.length > 20
+    },
+    {
+      title: 'Pattern Recognition',
+      professor: 'Patterns dhundhna Professor ki superpower hai.\n\nLog same mistakes repeat karte hain. Situations repeat hoti hain.\n\n*Agar tu pattern pehchan lega — toh predictable ban jayega. Aur predictable hona = control mein hona.*\n\nApni life mein dekho — kaunsa pattern baar baar repeat ho raha hai? Ise todne ka plan banao.',
+      exercise: 'Apni life mein ek recurring pattern dhoondo (positive ya negative). Pattern kya hai? Kaise shuru hota hai? Kaise khatam hota hai? Kaise tod sakte ho?',
+      check: (answer) => answer.length > 30
+    }
+  ],
+  'decision-making': [
+    {
+      title: 'Pros vs Cons + Gut',
+      professor: 'Professor logical hai but intuition bhi use karta hai.\n\n*His method:*\n1. Sab options likho (at least 3)\n2. Har option ke pros/cons likho\n3. Sabse logical option select karo\n4. Ab gut check karo — "mujhe kaisa lag raha hai?"\n5. Agar gut nahi maan raha — toh kuch miss kar rahe ho\n\nAaj ek decision lo using this method.',
+      exercise: 'Ek decision jo tumhe abhi lena hai (chhota ya bada). Options likho. Pros/Cons. Phir gut check. Kya decide kiya?',
+      check: (answer) => answer.length > 30
+    },
+    {
+      title: 'No Emotional Decisions',
+      professor: 'Professor kabhi gussa ya dar mein decision nahi leta.\n\n*Rule:* Jab emotion high ho — decision postpone karo.\n\n"Jab main calm hoon, tab main strong hoon." — El Profesor\n\nAgar koi urgent lage bhi — toh 10 seconds ka deep breath lo. Phir socho.\n\nAaj jab bhi koi impulse aaye — 10 seconds wait karo. Phir decide karo.',
+      exercise: 'Pichle 1 hafte mein koi aisa decision jo tumne emotion mein le liya aur baad mein pachtawa hua? Ab uss situation mein — Professor kaise leta?',
+      check: (answer) => answer.length > 30
+    }
+  ],
+  'leadership': [
+    {
+      title: 'Lead Without Leading',
+      professor: 'Professor physically kuch nahi karta — but sab kuch woh hi control karta hai.\n\n*Leadership secrets:*\n├ Team ko mission do, micro-manage mat karo\n├ Har member ki strength use karo\n├ Unhe lagne do ki woh decide kar rahe hain — jabki tumne wahi option unke saamne rakha\n├ Problem do, solution unse nikalwao\n\n*Rule:* Ek achha leader woh hai jiska naam nahi aata — but uske bina kuch nahi hota.',
+      exercise: 'Agar tumhe ek team banani hai 3 logo ki — toh kaunse 3 log hoge? Unki strengths kya hain? Kaise unhe assign karoge?',
+      check: (answer) => answer.length > 30
+    },
+    {
+      title: 'Trust but Verify',
+      professor: 'Professor apne team pe trust karta hai — but phir bhi sab verify karta hai.\n\n*Dil se trust, dimaag se verify.*\n\nAgar koi tujhe bol raha hai "sab theek hai" — toh jaake khud dekh. Ek baar nahi, do baar.\n\n*Aaj karo:*\n- Kisi cheez ko verify karo — assumption mat lo\n- "Sab theek hai" sunne ke baad bhi khud check karo',
+      exercise: 'Apni life mein aisi kaunsi cheez hai jahan tum assumption le rahe ho ki "sab theek hai"? Verify kaise karoge?',
+      check: (answer) => answer.length > 20
+    }
+  ],
+  'patience': [
+    {
+      title: 'Waiting is Power',
+      professor: 'Professor ko wait karna aata hai.\n\nUska poora plan months, sometimes years ka hota hai. Woh jaanta hai ki:\n\n- Sahi waqt ka wait karna = sabse badi strength\n- Jaldi mein liya decision = mostly galat decision\n- Silence = sabse powerful weapon\n\nAaj ek kaam karo — jahan normally turant react karte ho, wahan 1 ghanta wait karo. Dekho kya hota hai.',
+      exercise: 'Koi aisi situation jahan tum normally impatient ho jaate ho. Kaunsa trigger hai? Kaise control karoge? Kya hoga agar 1 din wait karo?',
+      check: (answer) => answer.length > 30
+    },
+    {
+      title: 'Delayed Gratification',
+      professor: 'Professor aaj ka comfort chhodta hai kal ki victory ke liye.\n\nWoh jaanta hai ki:\n- Aaj mehnat → Kal result\n- Aaj sacrifice → Kal reward\n- Aaj discipline → Kal freedom\n\nTerze life mein kaunsa aram hai jo tu abhi chhod sakta hai for a bigger goal?',
+      exercise: 'Ek cheez jo tum aaj chhod sakte ho (time/money/habit) jo kal tumhe bada result de. Kya hai? Kaise karoge?',
+      check: (answer) => answer.length > 20
+    }
+  ],
+  'master-plan': [
+    {
+      title: 'The Blueprint',
+      professor: 'Har successful operation ka ek detailed blueprint hota hai.\n\n*Professor\'s Blueprint Structure:*\n├ Mission Objective (ek line mein)\n├ Timeline (day-by-day)\n├ Team Roles (kaun kya karega)\n├ Resources Needed (kitna paisa, tools, log)\n├ Phase 1, 2, 3 (breakdown)\n├ Risks & Contingencies (har phase ka)\n├ Success Criteria (kaise pata chalega ki jeet gaye)\n└ Exit Strategy (agar sab fail ho jaye)\n\nAaj apni life ke kisi goal ka blueprint banao.',
+      exercise: 'Apne ek bade goal ka blueprint banao upar diye structure ke saath. Har point likho.',
+      check: (answer) => answer.length > 50
+    },
+    {
+      title: 'The Heist Mindset',
+      professor: 'Life ek heist hai bhai.\n\nHar din tu kuch na kuch "getaway" kar raha hai — time, money, opportunities.\n\n*Professor ka final lesson:*\n├ Har situation ko ek puzzle ki tarah dekh\n├ Always have an exit plan\n├ Jab sab log panic kar rahe hon — tu calm reh\n├ Kuch bhi plan karo, par shuruaat kar do\n├ Perfect plan ka wait nahi karte — "Better done than perfect"\n└ Aur sabse important... *Darna nahi hai*\n\nProfessor dar nahi sakta. Dar aata hai tab jab tune apna kaam nahi kiya. Agar tune proper plan banaya, toh dar kiska?',
+      exercise: 'Aaj se tu Professor hai. Kal ka ek scenario soch — aur pura plan bana. Phir uspe act kar.\n\nYeh sirf ek exercise nahi hai — yeh tere sochne ka tareeqa badal dega.\n\n*"Andar ki baat yeh hai — main kabhi haar nahi maanta."* — El Profesor 🎯',
+      check: (answer) => answer.length > 30
+    }
+  ]
+};
+
+// === STATE ===
+let state = {
+  level: 1,
+  xp: 0,
+  completedLessons: {},
+  currentModule: null,
+  currentLesson: 0,
+  phase: 1,
+  awaitingAnswer: false
+};
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('professorState');
+    if (saved) state = JSON.parse(saved);
+  } catch(e) {}
+}
+
+function saveState() {
+  localStorage.setItem('professorState', JSON.stringify(state));
+}
+
+function resetProgress() {
+  if (!confirm('Saari progress delete ho jayegi. Sure?')) return;
+  state = { level:1, xp:0, completedLessons:{}, currentModule:null, currentLesson:0, phase:1, awaitingAnswer:false };
+  saveState();
+  renderModules();
+  showProfessor('Welcome back, cadet. Progress reset kar diya. Naye safar ki shuruaat! 🎯\n\nModule select karo aur training shuru karo.');
+}
+
+// === XP & LEVEL ===
+function addXP(amount) {
+  state.xp += amount;
+  const needed = state.level * 100;
+  while (state.xp >= needed) {
+    state.xp -= needed;
+    state.level++;
+    showMastery(`⬆️ LEVEL UP! You are now Level ${state.level}!`);
+  }
+  state.phase = Math.min(3, Math.floor(state.level / 2) + 1);
+  saveState();
+  updateUI();
+}
+
+function showMastery(msg) {
+  const m = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.innerHTML = `<div class="message"><div class="msg-prof"><div class="msg-avatar">🎯</div><div class="msg-bubble" style="background:rgba(255,215,0,0.2);border-color:#ffd700;text-align:center;font-weight:700">${msg}</div></div></div>`;
+  m.appendChild(div);
+  m.scrollTop = m.scrollHeight;
+}
+
+// === UI UPDATES ===
+function updateUI() {
+  const needed = state.level * 100;
+  const pct = Math.min(100, (state.xp / needed) * 100);
+  document.getElementById('levelDisplay').textContent = state.level;
+  document.getElementById('xpDisplay').textContent = state.xp;
+  document.getElementById('phaseDisplay').textContent = state.phase;
+  document.getElementById('xpFill').style.width = pct + '%';
+  document.getElementById('phaseName').textContent = `Phase ${state.phase}: ${['Strategic Foundation','Advanced Tactics','Mastery & Leadership'][state.phase-1]}`;
+  
+  const total = Object.keys(state.completedLessons).length;
+  document.getElementById('phaseDetail').textContent = `${total} / ${Object.keys(LESSONS).reduce((a,m) => a + LESSONS[m].length, 0)} lessons`;
+  document.getElementById('xpNeeded').textContent = `${needed - state.xp} XP to next level`;
+}
+
+// === MODULES ===
+function renderModules() {
+  const grid = document.getElementById('moduleGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(mod => {
+    const btn = document.createElement('button');
+    btn.className = 'module-btn' + (state.currentModule === mod.id ? ' active' : '');
+    const complete = state.completedLessons[mod.id] || 0;
+    const total = LESSONS[mod.id]?.length || 0;
+    btn.innerHTML = `<span class="icon">${mod.icon}</span><span class="name">${mod.name}</span><span class="desc">${complete}/${total} done</span>`;
+    btn.onclick = () => startModule(mod.id);
+    if (mod.phase > state.phase) {
+      btn.style.opacity = '0.4';
+      btn.title = 'Phase ' + mod.phase + ' mein unlock hoga';
+    }
+    grid.appendChild(btn);
+  });
+}
+
+// === MESSAGES ===
+function showProfessor(text) {
+  const m = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'message';
+  div.innerHTML = `<div class="msg-prof"><div class="msg-avatar">🎯</div><div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div></div>`;
+  m.appendChild(div);
+  m.scrollTop = m.scrollHeight;
+}
+
+function showUser(text) {
+  const m = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'message';
+  div.innerHTML = `<div class="msg-user"><div class="msg-avatar">👤</div><div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div></div>`;
+  m.appendChild(div);
+  m.scrollTop = m.scrollHeight;
+}
+
+function showOptions(options, callback) {
+  const m = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'message';
+  let html = '<div class="options-grid">';
+  options.forEach((opt, i) => {
+    html += `<button class="option-btn" data-idx="${i}">${opt}</button>`;
+  });
+  html += '</div>';
+  div.innerHTML = html;
+  m.appendChild(div);
+  m.scrollTop = m.scrollHeight;
+  
+  div.querySelectorAll('.option-btn').forEach(btn => {
+    btn.onclick = () => {
+      div.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+      showUser(btn.textContent);
+      callback(parseInt(btn.dataset.idx));
+    };
+  });
+}
+
+function showTyping(on) {
+  document.getElementById('typingIndicator').className = 'typing-indicator' + (on ? ' active' : '');
+}
+
+// === TRAINING SESSION ===
+function startModule(moduleId) {
+  if (MODULES.find(m => m.id === moduleId).phase > state.phase) {
+    showProfessor(`🔒 Yeh module Phase ${MODULES.find(m => m.id === moduleId).phase} mein unlock hoga. Pehle previous phases complete karo.`);
+    return;
+  }
+  
+  state.currentModule = moduleId;
+  state.currentLesson = 0;
+  state.awaitingAnswer = false;
+  saveState();
+  renderModules();
+  
+  document.getElementById('chatMessages').innerHTML = '';
+  
+  const mod = MODULES.find(m => m.id === moduleId);
+  showProfessor(`*${mod.icon} ${mod.name} Module* — shuru karte hain!\n\nYeh module mein ${LESSONS[moduleId].length} lessons hain. Ready ho?`);
+  
+  setTimeout(() => startLesson(moduleId, 0), 500);
+}
+
+function startLesson(moduleId, idx) {
+  const lessons = LESSONS[moduleId];
+  if (idx >= lessons.length) {
+    showProfessor(`🎉 *Module Complete!* ${MODULES.find(m => m.id === moduleId).name} ke saare lessons ho gaye!\n\n+50 XP mila!`);
+    addXP(50);
+    state.currentModule = null;
+    saveState();
+    renderModules();
+    return;
+  }
+  
+  state.currentLesson = idx;
+  state.awaitingAnswer = false;
+  saveState();
+  
+  const lesson = lessons[idx];
+  const prog = `${idx+1}/${lessons.length}`;
+  
+  setTimeout(() => {
+    showProfessor(`*📖 Lesson ${prog}: ${lesson.title}*\n\n${lesson.professor}`);
+    
+    setTimeout(() => {
+      showProfessor(`✍️ *Exercise:*\n\n${lesson.exercise}`);
+      state.awaitingAnswer = true;
+      document.getElementById('userInput').placeholder = 'Apna answer likho...';
+      document.getElementById('userInput').focus();
+    }, 800);
+  }, 300);
+}
+
+function sendMessage() {
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text) return;
+  
+  if (!state.awaitingAnswer) {
+    showProfessor('Pehle exercise ka answer do ya option select karo 🧠');
+    input.value = '';
+    return;
+  }
+  
+  input.value = '';
+  showUser(text);
+  state.awaitingAnswer = false;
+  document.getElementById('sendBtn').disabled = true;
+  showTyping(true);
+  
+  const modId = state.currentModule;
+  const lesson = LESSONS[modId][state.currentLesson];
+  
+  setTimeout(() => {
+    showTyping(false);
+    
+    if (lesson.check(text)) {
+      showProfessor(`*Shabash!* 🔥\n\nProfessor ko tera approach pasand aaya. Tu sahi raaste pe hai.\n\n+20 XP!`);
+      addXP(20);
+      
+      // Mark lesson complete
+      state.completedLessons[modId] = (state.completedLessons[modId] || 0) + 1;
+      saveState();
+      renderModules();
+      
+      if (state.currentLesson + 1 < LESSONS[modId].length) {
+        const next = state.currentLesson + 1;
+        const nextLesson = LESSONS[modId][next];
+        showOptions(['✅ Next Lesson →'], () => {
+          startLesson(modId, next);
+        });
+      } else {
+        showProfessor(`🎯 *Module Complete!* +50 XP bonus!`);
+        addXP(50);
+        state.currentModule = null;
+        saveState();
+        renderModules();
+        showOptions(['🏠 Modules pe wapas jao'], () => {
+          document.getElementById('chatMessages').innerHTML = '';
+          showProfessor('Module select karo:');
+        });
+      }
+    } else {
+      showProfessor(`*Thoda aur socho bhai...*\n\nTera answer thoda short hai. Professor ki tarah detail mein jao — situation, options, reasoning sab likho.\n\nKoshish karo phir se! 🔄\n\nHint: ${lesson.title} ke baare mein aur deeply socho.`);
+      state.awaitingAnswer = true;
+      document.getElementById('userInput').placeholder = 'Dobara try karo...';
+      document.getElementById('userInput').focus();
+    }
+    document.getElementById('sendBtn').disabled = false;
+  }, 1200);
+}
+
+// === INIT ===
+loadState();
+updateUI();
+renderModules();
+showProfessor('🎯 *El Profesor* is ready to train you.\n\nMain tera personal strategic mindset coach hoon. Jo tu seekhega, woh tere sochne ka tareeqa badal dega.\n\n*Coach karta hoon, spoon-feed nahi.* Tu khudi sochega, main direction dunga.\n\n🔥 *Select a module above and start your training!*');
+</script>
+</body>
+</html>

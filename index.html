@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Profesor AI">
+<meta name="theme-color" content="#0a0a0f">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='38' fill='%230a0a0f'/%3E%3Ctext x='50%25' y='55%25' font-size='120' text-anchor='middle' dominant-baseline='central'%3E🎯%3C/text%3E%3C/svg%3E">
+<title>🎯 El Profesor — Mindset Trainer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Inter',-apple-system,sans-serif;background:#0a0a0f;color:#e0e0e0;min-height:100vh;min-height:100dvh;overflow-x:hidden;user-select:none;-webkit-user-select:none}
+  
+  /* Safe area for notched phones */
+  .safe-area{padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0)}
+  
+  .bg-pattern{position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,#1a1a2e 0%,transparent 50%),radial-gradient(ellipse at 80% 50%,#16213e 0%,transparent 50%);z-index:-1;pointer-events:none}
+  .bg-pattern::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+
+  /* Header */
+  .header{background:linear-gradient(135deg,#0f0f1a 0%,#1a1a2e 100%);border-bottom:1px solid rgba(255,215,0,0.2);padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top,0));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo-icon{font-size:24px}
+  .logo-text{font-size:16px;font-weight:800;background:linear-gradient(135deg,#ffd700,#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .logo-sub{font-size:10px;color:#888;font-weight:500;letter-spacing:1px;text-transform:uppercase}
+  .stats-bar{display:flex;gap:10px;font-size:12px}
+  .stat-item{text-align:center;min-width:40px}
+  .stat-value{color:#ffd700;font-weight:700;font-size:14px}
+  .stat-label{color:#666;font-size:9px;text-transform:uppercase;letter-spacing:0.5px}
+
+  /* Container */
+  .container{max-width:900px;margin:0 auto;padding:12px}
+
+  /* Phase Progress */
+  .phase-progress{background:linear-gradient(135deg,#12121f,#1a1a2e);border-radius:12px;padding:14px;margin-bottom:12px;border:1px solid rgba(255,215,0,0.1)}
+  .phase-title{font-size:11px;color:#ffd700;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:4px}
+  .phase-name{font-size:17px;font-weight:700;margin-bottom:8px}
+  .level-bar{height:5px;background:#222;border-radius:3px;overflow:hidden;margin-bottom:4px}
+  .level-fill{height:100%;background:linear-gradient(90deg,#ffd700,#ffaa00);border-radius:3px;transition:width 0.5s;width:0%}
+  .level-text{font-size:11px;color:#888;display:flex;justify-content:space-between}
+
+  /* Module Grid */
+  .module-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .module-btn{background:linear-gradient(135deg,#12121f,#1a1a2e);border:1px solid rgba(255,215,0,0.1);border-radius:10px;padding:10px 8px;cursor:pointer;transition:all 0.2s;text-align:left;font-family:inherit;color:#ddd;-webkit-tap-highlight-color:transparent}
+  .module-btn:active{transform:scale(0.97)}
+  .module-btn.active{border-color:#ffd700;background:rgba(255,215,0,0.08)}
+  .module-btn .icon{font-size:20px;margin-bottom:3px;display:block}
+  .module-btn .name{font-weight:600;font-size:12px;display:block}
+  .module-btn .desc{font-size:10px;color:#666;margin-top:2px;display:block}
+
+  /* Chat Area */
+  .chat-area{background:linear-gradient(135deg,#12121f,#1a1a2e);border-radius:12px;border:1px solid rgba(255,215,0,0.1);overflow:hidden;min-height:350px;display:flex;flex-direction:column}
+  .chat-header{background:rgba(255,215,0,0.05);padding:10px 14px;border-bottom:1px solid rgba(255,215,0,0.1);display:flex;justify-content:space-between;align-items:center}
+  .chat-title{font-weight:600;font-size:13px}
+  .chat-title span{color:#ffd700}
+  .chat-messages{padding:14px;flex:1;overflow-y:auto;max-height:50vh;min-height:250px;-webkit-overflow-scrolling:touch}
+  .message{margin-bottom:12px;animation:msgIn 0.3s ease}
+  @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  
+  .msg-prof{display:flex;gap:10px;align-items:flex-start}
+  .msg-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ffd700,#b8860b);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .msg-bubble{background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.15);border-radius:10px 10px 10px 4px;padding:10px 13px;max-width:88%;line-height:1.5;font-size:13px}
+  .msg-bubble strong{color:#ffd700}
+  
+  .msg-user{display:flex;gap:10px;flex-direction:row-reverse;align-items:flex-start}
+  .msg-user .msg-avatar{background:linear-gradient(135deg,#444,#666)}
+  .msg-user .msg-bubble{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);border-radius:10px 10px 4px 10px}
+
+  /* Options */
+  .options-grid{display:grid;grid-template-columns:1fr;gap:6px;margin-top:8px}
+  .option-btn{background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2);color:#ddd;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit;transition:all 0.2s;text-align:center}
+  .option-btn:active{background:rgba(255,215,0,0.2);transform:scale(0.97)}
+  .option-btn:disabled{opacity:0.3;cursor:not-allowed;transform:none}
+
+  /* Input */
+  .chat-input{display:flex;gap:8px;padding:10px 14px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0));border-top:1px solid rgba(255,215,0,0.1);background:rgba(0,0,0,0.3)}
+  .chat-input input{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#fff;font-size:14px;font-family:inherit;outline:none;transition:border 0.2s}
+  .chat-input input:focus{border-color:#ffd700}
+  .chat-input input::placeholder{color:#555;font-size:13px}
+  .chat-input button{background:linear-gradient(135deg,#ffd700,#b8860b);border:none;color:#0a0a0f;padding:10px 16px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;transition:all 0.2s;font-family:inherit;white-space:nowrap}
+  .chat-input button:active{transform:scale(0.95)}
+  .chat-input button:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+
+  /* Typing */
+  .typing-indicator{display:none;align-items:center;gap:6px;padding:6px 14px;font-size:11px;color:#888}
+  .typing-indicator.active{display:flex}
+  .typing-dots{display:flex;gap:3px}
+  .typing-dots span{width:6px;height:6px;border-radius:50%;background:#ffd700;animation:typing 1.4s infinite}
+  .typing-dots span:nth-child(2){animation-delay:0.2s}
+  .typing-dots span:nth-child(3){animation-delay:0.4s}
+  @keyframes typing{0%,60%,100%{opacity:0.3;transform:scale(0.8)}30%{opacity:1;transform:scale(1)}}
+
+  /* Web Intel Panel */
+  .intel-btn{background:rgba(0,150,255,0.1);border:1px solid rgba(0,150,255,0.2);color:#4af;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit;transition:all 0.2s}
+  .intel-btn:active{background:rgba(0,150,255,0.2)}
+  .search-result{background:rgba(0,150,255,0.05);border:1px solid rgba(0,150,255,0.1);border-radius:8px;padding:10px;margin-top:8px;font-size:12px;line-height:1.4}
+  .search-result a{color:#4af;text-decoration:none;word-break:break-all}
+  .search-result .title{color:#ffd700;font-weight:600;margin-bottom:3px}
+  .intel-badge{background:rgba(0,150,255,0.15);color:#4af;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
+
+  /* Bottom Install Banner */
+  .install-banner{display:none;position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#1a1a2e,#0f0f1a);border-top:1px solid rgba(255,215,0,0.2);padding:10px 16px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0));z-index:200;align-items:center;gap:12px}
+  .install-banner.show{display:flex}
+  .install-banner p{font-size:12px;flex:1}
+  .install-banner button{background:#ffd700;border:none;color:#0a0a0f;padding:8px 16px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit}
+  .install-banner .close-btn{background:none;border:none;color:#666;font-size:18px;cursor:pointer;padding:4px}
+
+  /* Others */
+  .reset-btn{background:rgba(255,0,0,0.1);border:1px solid rgba(255,0,0,0.2);color:#ff6b6b;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit;transition:all 0.2s}
+  .reset-btn:active{background:rgba(255,0,0,0.2)}
+
+  @media(min-width:768px){
+    .module-grid{grid-template-columns:repeat(4,1fr)}
+    .options-grid{grid-template-columns:1fr 1fr}
+    .chat-messages{max-height:400px}
+  }
+</style>
+</head>
+<body class="safe-area">
+<div class="bg-pattern"></div>
+
+<!-- Install Banner -->
+<div class="install-banner" id="installBanner">
+  <p>📲 Install karo — Home Screen pe app ki tarah chalega!</p>
+  <button id="installBtn">Install</button>
+  <button class="close-btn" onclick="document.getElementById('installBanner').classList.remove('show')">✕</button>
+</div>
+
+<!-- Header -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">🎯</div>
+    <div>
+      <div class="logo-text">El Profesor</div>
+      <div class="logo-sub">Mindset Trainer</div>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-item"><div class="stat-value" id="levelDisplay">1</div><div class="stat-label">Lvl</div></div>
+    <div class="stat-item"><div class="stat-value" id="xpDisplay">0</div><div class="stat-label">XP</div></div>
+    <div class="stat-item"><div class="stat-value" id="phaseDisplay">1</div><div class="stat-label">Phase</div></div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="phase-progress">
+    <div class="phase-title">Mission</div>
+    <div class="phase-name" id="phaseName">Phase 1: Strategic Foundation</div>
+    <div class="level-bar"><div class="level-fill" id="xpFill" style="width:0%"></div></div>
+    <div class="level-text"><span id="phaseDetail">0 / 0 lessons</span><span id="xpNeeded">100 XP</span></div>
+  </div>
+
+  <div class="module-grid" id="moduleGrid"></div>
+
+  <div class="chat-area">
+    <div class="chat-header">
+      <div class="chat-title">🧠 <span>Professor</span></div>
+      <div style="display:flex;gap:6px">
+        <button class="intel-btn" id="intelBtn" onclick="toggleIntel()">🌐 Intel</button>
+        <button class="reset-btn" onclick="resetProgress()">↻</button>
+      </div>
+    </div>
+    <div class="typing-indicator" id="typingIndicator">
+      <span>Professor is thinking</span>
+      <div class="typing-dots"><span></span><span></span><span></span></div>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Apna jawab likho..." autocomplete="off">
+      <button id="sendBtn" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  PROFESSOR MINDSET TRAINER — v2.0 (Mobile PWA + Web Intel)
+// ============================================================
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
+// Install Prompt
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('show');
+});
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const result = await deferredPrompt.userChoice;
+    if (result.outcome === 'accepted') document.getElementById('installBanner').classList.remove('show');
+    deferredPrompt = null;
+  }
+});
+
+// === DATA ===
+const MODULES = [
+  {id:'strategic-thinking',icon:'🧠',name:'Strategic Thinking',desc:'10 steps ahead',phase:1},
+  {id:'contingency',icon:'🔄',name:'Contingency',desc:'Plan B,C,D',phase:1},
+  {id:'psychology',icon:'🎭',name:'Psychology',desc:'Influence',phase:2},
+  {id:'observation',icon:'🔍',name:'Observation',desc:'Details',phase:2},
+  {id:'decision-making',icon:'⚡',name:'Decisions',desc:'Right call',phase:2},
+  {id:'leadership',icon:'👑',name:'Leadership',desc:'Team',phase:3},
+  {id:'patience',icon:'⏳',name:'Patience',desc:'Timing',phase:3},
+  {id:'master-plan',icon:'🎯',name:'Master Plan',desc:'Blueprint',phase:3},
+];
+
+const LESSONS = {
+  'strategic-thinking':[
+    {title:'10 Steps Ahead',professor:`Bhai, Professor aur common aadmi mein farak kya hai?\n\nCommon aadmi 1-2 step aage sochta hai. Professor 10 steps aage sochta hai.\n\nJab woh Mint mein ghus raha tha, tabhi usne soch liya tha:\n- Kya hoga agar police aa gayi? (Step 3)\n- Kya hoga agar andar koi revolt kare? (Step 5)\n- Kya hoga agar plan leak ho jaye? (Step 8)\n\n*Rule:* Har decision ke baad pooch — "Agar yeh fail ho jaye toh?"`,exercise:'Scenario: Tum ek business shuru kar rahe ho. 5 steps aage ka plan banao.\n\nStep 1: Business register\nStep 2: Product banao\nStep 3: ?\nStep 4: ?\nStep 5: ?\n\nAur har step ka backup?',check:a=>a.length>20},
+    {title:'Chess Not Checkers',professor:`Professor hamesha chess khelta hai — checkers nahi.\n\nCheckers mein bas agla move sochte ho. Chess mein poori game pattern sochte ho.\n\n*Professor ka method:*\n1. Objective clear karo\n2. Resources identify karo\n3. Timeline banao\n4. Risks identify karo\n5. Contingencies ready karo`,exercise:'Apni life ki ek problem lo. Upar ke 5 steps apply karo.',check:a=>a.length>30},
+    {title:'Multiple Perspectives',professor:`Professor har situation ko 4 angles se dekhta hai:\n\n1. *Apna angle*\n2. *Dushman ka angle*\n3. *Audience ka angle*\n4. *Hidden angle*\n\nJab tu koi bhi decision le — pehle yeh 4 angles nikaal.`,exercise:'Ek conflict socho. 4 angles se analyze karo.',check:a=>a.length>30},
+    {title:'Information Asymmetry',professor:`Professor ka sabse powerful weapon — information.\n\nWoh jaanta hai jo doosra nahi jaanta.\n\n*Rule:*\n- Jo tu jaanta hai, 80% apne paas rakh\n- Sirf 20% doosron ko bata\n- Har baat ka time aur place hota hai`,exercise:'Tere paas kya info hai jo doosron ko nahi? Kaise use karega?',check:a=>a.length>20},
+    {title:'Endgame Visualization',professor:`Professor har operation ka end pehle se dekh leta hai.\n\nWoh reverse-engineer karta hai — final scene se start karke aaj tak.\n\n*Try:* 1 saal baad perfect life imagine kar → reverse engineer karo.`,exercise:'1 saal baad kya achieve karna chahte ho? 5 milestones reverse engineer karo.',check:a=>a.length>30}
+  ],
+  'contingency':[
+    {title:'Plan B Mindset',professor:`Professor kabhi ek plan pe rely nahi karta.\n\nHar plan ka "Agar yeh fail ho jaye toh" version ready.\n\nAaj ek cheez ka Plan B, C, D banao.`,exercise:'Apne ek important plan ke 3 backup plans banao.',check:a=>a.length>40},
+    {title:'Risk Assessment',professor:`Professor har scenario ka risk calculate karta hai:\n\n*Matrix:*\n├ High Prob + High Impact → Plan B chahiye\n├ High Prob + Low Impact → Monitor\n├ Low Prob + High Impact → Emergency plan\n└ Low Prob + Low Impact → Ignore`,exercise:'Ek decision ko is matrix mein daalo.',check:a=>a.length>30}
+  ],
+  'psychology':[
+    {title:'Reading People',professor:`Professor logon ko aise padhta hai jaise kitaab.\n\n*Signals:*\n- Kya bol rahe vs kya nahi bol rahe\n- Body language\n- Unka fear kya? Greed kya?\n\nHar aadmi ka weak point hota hai.`,exercise:'Ek close friend ka fear, motivation, trigger point kya hai?',check:a=>a.length>30},
+    {title:'Controlling Narrative',professor:`Professor hamesha narrative control karta hai.\n\n*Technique:*\n├ Info leak karo jo tum chahte ho ki log soche\n├ Fake tracks banao\n├ Timing perfect rakho`,exercise:'Ek situation jahan log galat soch rahe hain. Narrative kaise change karoge?',check:a=>a.length>30}
+  ],
+  'observation':[
+    {title:'Details Matter',professor:`Professor har chhoti detail notice karta hai.\n\n"Devil is in the details."\n\nEk chhoti chook poori operation fail kar sakti hai.\n\n*Aaj:* 10 cheezein notice karo jo normally ignore karte ho.`,exercise:'5 cheezein likho jo normally ignore karte ho. Unka significance kya hai?',check:a=>a.length>20},
+    {title:'Pattern Recognition',professor:`Patterns dhundhna = Professor ki superpower.\n\nLog same mistakes repeat karte hain.\n\nAgar pattern pehchan liya → predictable → control mein.`,exercise:'Apni life ka ek recurring pattern. Kaise tod sakte ho?',check:a=>a.length>30}
+  ],
+  'decision-making':[
+    {title:'Pros/Cons + Gut',professor:`Professor logical + intuition dono use karta hai.\n\n*Method:*\n1. Options likho (≥3)\n2. Har ke pros/cons\n3. Sabse logical select karo\n4. Gut check — "kaisa lag raha hai?"`,exercise:'Ek decision abhi. Options, pros/cons, gut check. Kya decide kiya?',check:a=>a.length>30},
+    {title:'No Emotional Decisions',professor:`Professor kabhi emotion mein decision nahi leta.\n\n*Rule:* Jab emotion high ho → postpone karo.\n\n"Jab main calm hoon, tab main strong hoon."\n\nAaj impulse aaye toh 10 sec wait karo.`,exercise:'Pichle hafte ka ek emotional decision. Professor kaise leta?',check:a=>a.length>30}
+  ],
+  'leadership':[
+    {title:'Lead Without Leading',professor:`Professor physically kuch nahi karta — but sab kuch woh control karta hai.\n\n*Secrets:*\n├ Team ko mission do, micro-manage mat karo\n├ Har member ki strength use karo\n├ Unhe lage ki woh decide kar rahe hain\n└ Problem do, solution unse nikalwao`,exercise:'3 logo ki team. Kaun? Unki strengths? Kaise assign karoge?',check:a=>a.length>30},
+    {title:'Trust but Verify',professor:`Dil se trust, dimaag se verify.\n\nProfessor apne team pe trust karta hai — but sab verify karta hai.\n\nKoi bole "sab theek hai" → jaake khud dekh.`,exercise:'Kaunsi cheez mein assumption le rahe ho "sab theek hai"? Verify kaise karoge?',check:a=>a.length>20}
+  ],
+  'patience':[
+    {title:'Waiting is Power',professor:`Professor ko wait karna aata hai.\n\n- Sahi waqt ka wait = sabse badi strength\n- Jaldi mein decision = mostly galat\n- Silence = powerful weapon\n\nAaj jahan normally react karte ho, wahan 1 ghanta wait karo.`,exercise:'Kaunsa trigger hai jahan impatient ho jaate ho? Kaise control karoge?',check:a=>a.length>30},
+    {title:'Delayed Gratification',professor:`Professor aaj ka comfort chhodta hai kal ki victory ke liye.\n\nAaj mehnat → Kal result\nAaj sacrifice → Kal reward\nAaj discipline → Kal freedom`,exercise:'Ek cheez jo aaj chhod sakte ho jo kal bada result de.',check:a=>a.length>20}
+  ],
+  'master-plan':[
+    {title:'The Blueprint',professor:`Har successful operation ka detailed blueprint.\n\n*Structure:*\n├ Mission (ek line)\n├ Timeline (day-by-day)\n├ Team Roles\n├ Resources\n├ Phases 1-2-3\n├ Risks & Contingencies\n├ Success Criteria\n└ Exit Strategy`,exercise:'Apne ek bade goal ka blueprint banao.',check:a=>a.length>50},
+    {title:'The Heist Mindset',professor:`Life ek heist hai bhai.\n\nHar din tu kuch na kuch "getaway" kar raha hai.\n\n*Final lesson:*\n├ Har situation = puzzle\n├ Always have exit plan\n├ Jab sab panic karein → tu calm reh\n├ Kuch bhi plan karo, par shuruaat kar do\n└ *Darna nahi hai*\n\nDar aata hai jab tune apna kaam nahi kiya. Plan hai toh dar kiska? 🎯`,exercise:'Kal ka ek scenario soch. Poora plan bana. Phir uspe act kar.',check:a=>a.length>30}
+  ]
+};
+
+// === STATE ===
+let state = {level:1,xp:0,completedLessons:{},currentModule:null,currentLesson:0,phase:1,awaitingAnswer:false,intelMode:false};
+
+function loadState(){try{const s=localStorage.getItem('professorState');if(s)state=JSON.parse(s)}catch(e){}}
+function saveState(){localStorage.setItem('professorState',JSON.stringify(state))}
+
+function resetProgress(){
+  if(!confirm('Saari progress delete? Sure?'))return;
+  state={level:1,xp:0,completedLessons:{},currentModule:null,currentLesson:0,phase:1,awaitingAnswer:false,intelMode:false};
+  saveState();renderModules();clearChat();
+  showProfessor('Progress reset! Naye safar ki shuruaat 🎯');
+}
+
+function addXP(amt){
+  state.xp+=amt;const needed=state.level*100;
+  while(state.xp>=needed){state.xp-=needed;state.level++;showMastery(`⬆️ LEVEL UP! Level ${state.level}!`)}
+  state.phase=Math.min(3,Math.floor(state.level/2)+1);
+  saveState();updateUI();
+}
+
+function showMastery(t){addMessage('professor',`*${t}*`)}
+function clearChat(){document.getElementById('chatMessages').innerHTML=''}
+
+function addMessage(role,text){
+  const m=document.getElementById('chatMessages');
+  const d=document.createElement('div');d.className='message';
+  const avatar=role==='professor'?'🎯':'👤';
+  const cls=role==='professor'?'msg-prof':'msg-user';
+  d.innerHTML=`<div class="${cls}"><div class="msg-avatar">${avatar}</div><div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div></div>`;
+  m.appendChild(d);m.scrollTop=m.scrollHeight;
+}
+
+function showProfessor(t){addMessage('professor',t)}
+function showUser(t){addMessage('user',t)}
+
+function showOptions(opts,cb){
+  const m=document.getElementById('chatMessages');
+  const d=document.createElement('div');d.className='message';
+  let h='<div class="options-grid">';
+  opts.forEach((o,i)=>{h+=`<button class="option-btn" data-i="${i}">${o}</button>`});
+  h+='</div>';d.innerHTML=h;m.appendChild(d);m.scrollTop=m.scrollHeight;
+  d.querySelectorAll('.option-btn').forEach(b=>{b.onclick=()=>{
+    d.querySelectorAll('.option-btn').forEach(x=>x.disabled=true);
+    showUser(b.textContent);cb(parseInt(b.dataset.i));
+  }});
+}
+
+function showTyping(on){
+  document.getElementById('typingIndicator').className='typing-indicator'+(on?' active':'');
+}
+
+function updateUI(){
+  const needed=state.level*100;
+  const pct=Math.min(100,(state.xp/needed)*100);
+  document.getElementById('levelDisplay').textContent=state.level;
+  document.getElementById('xpDisplay').textContent=state.xp;
+  document.getElementById('phaseDisplay').textContent=state.phase;
+  document.getElementById('xpFill').style.width=pct+'%';
+  document.getElementById('phaseName').textContent=`Phase ${state.phase}: ${['Strategic Foundation','Advanced Tactics','Mastery & Leadership'][state.phase-1]}`;
+  const total=Object.values(state.completedLessons).reduce((a,b)=>a+b,0);
+  const allLessons=Object.values(LESSONS).reduce((a,b)=>a+b.length,0);
+  document.getElementById('phaseDetail').textContent=`${total}/${allLessons} lessons`;
+  document.getElementById('xpNeeded').textContent=`${needed-state.xp} XP to next`;
+}
+
+function renderModules(){
+  const g=document.getElementById('moduleGrid');g.innerHTML='';
+  MODULES.forEach(mod=>{
+    const b=document.createElement('button');b.className='module-btn'+(state.currentModule===mod.id?' active':'');
+    const c=state.completedLessons[mod.id]||0;
+    const t=LESSONS[mod.id]?.length||0;
+    b.innerHTML=`<span class="icon">${mod.icon}</span><span class="name">${mod.name}</span><span class="desc">${c}/${t}</span>`;
+    b.onclick=()=>startModule(mod.id);
+    if(mod.phase>state.phase){b.style.opacity='0.4';b.title='Phase '+mod.phase+' mein unlock'}
+    g.appendChild(b);
+  });
+}
+
+// === WEB INTEL AGENT ===
+function toggleIntel(){
+  state.intelMode=!state.intelMode;
+  const btn=document.getElementById('intelBtn');
+  btn.textContent=state.intelMode?'📝 Done':'🌐 Intel';
+  btn.style.borderColor=state.intelMode?'#4af':'rgba(0,150,255,0.2)';
+  if(state.intelMode){
+    clearChat();
+    showProfessor('🌐 *Web Intel Agent activated!*\n\nMain tere liye web search kar sakta hoon. Kya research karna hai?\n\nJaise: "latest AI trends 2026" ya "business ideas"\n\nYa phir `/search ai kaise kaam karta hai` bhi likh sakta hai.');
+  }else{
+    clearChat();
+    showProfessor('Web Intel deactivated. Normal mode pe wapas. Module select kar!');
+  }
+}
+
+async function webSearch(query){
+  showTyping(true);
+  try{
+    const r=await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+    const d=await r.json();
+    showTyping(false);
+    if(d.error){showProfessor(`Search error: ${d.error}`);return}
+    if(d.results?.length){
+      let msg='*🌐 Intel Report*\n\n';
+      d.results.forEach((res,i)=>{
+        msg+=`*${i+1}. ${res.title||'Result'}*\n${res.text||'No description'}\n`;
+        if(res.url)msg+=`[Link](${res.url})\n`;
+        msg+='\n';
+      });
+      showProfessor(msg);
+      addXP(5);
+    }else{
+      showProfessor('Koi results nahi mile. Kuch aur search karein?');
+    }
+  }catch(e){
+    showTyping(false);
+    showProfessor(`Search agent connect nahi ho paaya: ${e.message}\n\nServer chal raha hai? (python serve.py)`);
+  }
+}
+
+// === TRAINING ===
+function startModule(id){
+  if(MODULES.find(m=>m.id===id).phase>state.phase){
+    showProfessor(`🔒 Phase ${MODULES.find(m=>m.id===id).phase} mein unlock hoga.`);
+    return;
+  }
+  state.currentModule=id;state.currentLesson=0;state.awaitingAnswer=false;state.intelMode=false;
+  document.getElementById('intelBtn').textContent='🌐 Intel';
+  saveState();renderModules();clearChat();
+  const mod=MODULES.find(m=>m.id===id);
+  showProfessor(`*${mod.icon} ${mod.name}* — shuru!\n\n${LESSONS[id].length} lessons hain. Ready?`);
+  setTimeout(()=>startLesson(id,0),500);
+}
+
+function startLesson(id,idx){
+  const lessons=LESSONS[id];
+  if(idx>=lessons.length){
+    showProfessor(`🎉 *Module Complete!* +50 XP!`);
+    addXP(50);state.currentModule=null;saveState();renderModules();
+    showOptions(['🏠 Modules'],()=>{clearChat();showProfessor('Module select karo:')});
+    return;
+  }
+  state.currentLesson=idx;state.awaitingAnswer=false;saveState();
+  const l=lessons[idx];const prog=`${idx+1}/${lessons.length}`;
+  setTimeout(()=>{
+    showProfessor(`*📖 ${prog}: ${l.title}*\n\n${l.professor}`);
+    setTimeout(()=>{
+      showProfessor(`✍️ *Exercise:*\n\n${l.exercise}`);
+      state.awaitingAnswer=true;
+      document.getElementById('userInput').placeholder='Apna answer likho...';
+      document.getElementById('userInput').focus();
+    },800);
+  },300);
+}
+
+function sendMessage(){
+  const inp=document.getElementById('userInput');
+  const text=inp.value.trim();if(!text)return;
+  inp.value='';
+  
+  if(state.intelMode){webSearch(text);return}
+  
+  if(!state.awaitingAnswer){
+    showProfessor('Pehle exercise ka answer do ya option select karo 🧠');
+    return;
+  }
+  
+  showUser(text);state.awaitingAnswer=false;
+  document.getElementById('sendBtn').disabled=true;showTyping(true);
+  
+  const modId=state.currentModule;
+  const lesson=LESSONS[modId][state.currentLesson];
+  
+  setTimeout(()=>{
+    showTyping(false);
+    if(lesson.check(text)){
+      showProfessor(`*Shabash!* 🔥 +20 XP!`);
+      addXP(20);
+      state.completedLessons[modId]=(state.completedLessons[modId]||0)+1;
+      saveState();renderModules();
+      
+      if(state.currentLesson+1<LESSONS[modId].length){
+        showOptions(['✅ Next Lesson →'],()=>{startLesson(modId,state.currentLesson+1)});
+      }else{
+        showProfessor(`🎯 *Module Complete!* +50 XP bonus!`);
+        addXP(50);state.currentModule=null;saveState();renderModules();
+        showOptions(['🏠 Modules'],()=>{clearChat();showProfessor('Module select karo:')});
+      }
+    }else{
+      showProfessor(`*Thoda aur socho bhai...*\n\nAnswer short hai. Detail mein jao — situation, options, reasoning. Dobara try! 🔄\n\nHint: ${lesson.title} ke baare mein deeply socho.`);
+      state.awaitingAnswer=true;
+      document.getElementById('userInput').placeholder='Dobara try...';
+    }
+    document.getElementById('sendBtn').disabled=false;
+  },1200);
+}
+
+// Enter key handler
+document.getElementById('userInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage()});
+
+// === INIT ===
+loadState();updateUI();renderModules();
+showProfessor('🎯 *El Profesor* ready.\n\nMain tera personal mindset coach hoon. Jo seekhega, woh tere sochne ka tareeqa badal dega.\n\n🔥 *Module select karo aur start karo!*\n\n🌐 *Naya:* Web Intel Agent — search karo internet pe training ke dauran.');
+</script>
+</body>
+</html>

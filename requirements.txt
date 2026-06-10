@@ -1,0 +1,3 @@
+# No external deps needed — stdlib handles everything
+# gunicorn is listed as fallback but serve.py uses its own server
+gunicorn>=20.0
