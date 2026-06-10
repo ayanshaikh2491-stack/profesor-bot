@@ -115,27 +115,27 @@ class handler(BaseHTTPRequestHandler):
         return self._json({"error": "Not found"}, 404)
 
     def do_POST(self):
-        if self.path == "/api/chat":
-            length = int(self.headers.get("Content-Length", 0))
-            body = self.rfile.read(length).decode() if length else "{}"
-            try:
-                data = json.loads(body)
-            except json.JSONDecodeError:
-                return self._json({"error": "Invalid JSON"}, 400)
-
-            messages = data.get("messages", [])
-            temperature = data.get("temperature", 0.7)
-
-            if not messages:
-                return self._json({"error": "Messages required"}, 400)
-
-            if not any(m["role"] == "system" for m in messages):
-                messages.insert(0, {"role": "system", "content": SYSTEM_PROMPT})
-
-            result = call_llm(messages, temperature)
-            return self._json(result)
-
-        return self._json({"error": "Not found"}, 404)
+        """Handle POST /api/chat"""
+        try:
+            if self.path.startswith("/api/chat"):
+                length = int(self.headers.get("Content-Length", 0))
+                body = self.rfile.read(length).decode() if length else "null"
+                data = json.loads(body) if body.strip() else {}
+                messages = data.get("messages", [])
+                temperature = data.get("temperature", 0.7)
+                
+                if not messages:
+                    return self.send_json({"error": "Messages required"}, 400)
+                
+                if not any(m["role"] == "system" for m in messages):
+                    messages.insert(0, {"role": "system", "content": SYSTEM_PROMPT})
+                
+                result = call_llm(messages, temperature)
+                return self.send_json(result)
+            
+            return self.send_json({"error": "Not found"}, 404)
+        except Exception as e:
+            return self.send_json({"error": f"POST error: {str(e)}"}, 500)
 
     def handle_search(self):
         q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("q", [""])[0]

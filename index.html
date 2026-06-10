@@ -337,11 +337,10 @@ function renderModules(){
 async function callProfessor(messages){
   showTyping(true);
   try{
-    const r=await fetch('/api/chat',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({messages})
-    });
+    // Get last user message for GET API
+    const lastMsg = messages.filter(m=>m.role==='user').pop();
+    const query = lastMsg ? lastMsg.content : 'hello';
+    const r=await fetch(`/api/chat?q=${encodeURIComponent(query)}`);
     const d=await r.json();
     showTyping(false);
     if(d.error)return showProfessor(`*Error:* ${d.error}`);
