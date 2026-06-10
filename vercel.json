@@ -1,8 +1,4 @@
 {
   "buildCommand": null,
-  "outputDirectory": ".",
-  "routes": [
-    { "src": "/api/search", "dest": "/api/search.py" },
-    { "src": "/(.*)", "dest": "/$1" }
-  ]
+  "outputDirectory": "."
 }
