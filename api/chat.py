@@ -95,24 +95,20 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        if not self.path.startswith("/api/"):
-            return self.serve_static()
-
-        if self.path.startswith("/api/chat"):
-            params = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
-            q = params.get("q", [""])[0]
-            if q:
-                result = call_llm([
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": q},
-                ])
-                return self._json(result)
-            return self._json({"reply": "Kya poochhna hai bhai?"})
-
-        if self.path.startswith("/api/search"):
-            return self.handle_search()
-
-        return self._json({"error": "Not found"}, 404)
+        """Test: return simple JSON for any request"""
+        import random
+        # Always return JSON for any path
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        response = json.dumps({
+            "reply": "Bhai! API key set nahi hai. Vercel dashboard mein jaake PROFESSOR_API_KEY environment variable daal do! Tab tak offline mode mein hoon.",
+            "path": self.path,
+            "key_set": bool(os.environ.get("PROFESSOR_API_KEY", ""))
+        }).encode()
+        self.wfile.write(response)
+        return
 
     def do_POST(self):
         """Handle POST /api/chat"""
