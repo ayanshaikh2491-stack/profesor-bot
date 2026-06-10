@@ -160,6 +160,7 @@
     <div class="chat-header">
       <div class="chat-title">🧠 <span>Professor</span></div>
       <div style="display:flex;gap:6px">
+        <button class="intel-btn" id="chatBtn" onclick="startFreeChat()">💬 Chat</button>
         <button class="intel-btn" id="intelBtn" onclick="toggleIntel()">🌐 Intel</button>
         <button class="reset-btn" onclick="resetProgress()">↻</button>
       </div>
@@ -255,7 +256,7 @@ const LESSONS = {
 };
 
 // === STATE ===
-let state = {level:1,xp:0,completedLessons:{},currentModule:null,currentLesson:0,phase:1,awaitingAnswer:false,intelMode:false};
+let state = {level:1,xp:0,completedLessons:{},currentModule:null,currentLesson:0,phase:1,awaitingAnswer:false,intelMode:false,chatMode:false};
 
 function loadState(){try{const s=localStorage.getItem('professorState');if(s)state=JSON.parse(s)}catch(e){}}
 function saveState(){localStorage.setItem('professorState',JSON.stringify(state))}
@@ -332,8 +333,29 @@ function renderModules(){
   });
 }
 
+// === LLM API CALL ===
+async function callProfessor(messages){
+  showTyping(true);
+  try{
+    const r=await fetch('/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages})
+    });
+    const d=await r.json();
+    showTyping(false);
+    if(d.error)return showProfessor(`*Error:* ${d.error}`);
+    return d.reply;
+  }catch(e){
+    showTyping(false);
+    showProfessor(`😴 Professor so raha hai... Server se connect nahi ho paaya.`);
+    return null;
+  }
+}
+
 // === WEB INTEL AGENT ===
 function toggleIntel(){
+  if(state.chatMode)state.chatMode=false;
   state.intelMode=!state.intelMode;
   const btn=document.getElementById('intelBtn');
   btn.textContent=state.intelMode?'📝 Done':'🌐 Intel';
@@ -378,7 +400,7 @@ function startModule(id){
     showProfessor(`🔒 Phase ${MODULES.find(m=>m.id===id).phase} mein unlock hoga.`);
     return;
   }
-  state.currentModule=id;state.currentLesson=0;state.awaitingAnswer=false;state.intelMode=false;
+  state.currentModule=id;state.currentLesson=0;state.awaitingAnswer=false;state.intelMode=false;state.chatMode=false;
   document.getElementById('intelBtn').textContent='🌐 Intel';
   saveState();renderModules();clearChat();
   const mod=MODULES.find(m=>m.id===id);
@@ -412,49 +434,74 @@ function sendMessage(){
   const text=inp.value.trim();if(!text)return;
   inp.value='';
   
+  // Web Intel Mode
   if(state.intelMode){webSearch(text);return}
   
-  if(!state.awaitingAnswer){
-    showProfessor('Pehle exercise ka answer do ya option select karo 🧠');
+  // Free Chat Mode
+  if(state.chatMode){
+    showUser(text);
+    callProfessor([{role:'user',content:text}]).then(reply=>{
+      if(reply)showProfessor(reply);
+    });
     return;
   }
   
-  showUser(text);state.awaitingAnswer=false;
-  document.getElementById('sendBtn').disabled=true;showTyping(true);
-  
-  const modId=state.currentModule;
-  const lesson=LESSONS[modId][state.currentLesson];
-  
-  setTimeout(()=>{
-    showTyping(false);
-    if(lesson.check(text)){
-      showProfessor(`*Shabash!* 🔥 +20 XP!`);
-      addXP(20);
-      state.completedLessons[modId]=(state.completedLessons[modId]||0)+1;
-      saveState();renderModules();
-      
-      if(state.currentLesson+1<LESSONS[modId].length){
-        showOptions(['✅ Next Lesson →'],()=>{startLesson(modId,state.currentLesson+1)});
-      }else{
-        showProfessor(`🎯 *Module Complete!* +50 XP bonus!`);
-        addXP(50);state.currentModule=null;saveState();renderModules();
-        showOptions(['🏠 Modules'],()=>{clearChat();showProfessor('Module select karo:')});
+  // Exercise Answer Mode
+  if(state.awaitingAnswer){
+    showUser(text);state.awaitingAnswer=false;
+    document.getElementById('sendBtn').disabled=true;showTyping(true);
+    
+    const modId=state.currentModule;
+    const lesson=LESSONS[modId][state.currentLesson];
+    
+    // Call LLM for real feedback
+    const prompt = `User ne "${lesson.title}" lesson ka exercise kiya.\n\nExercise:\n${lesson.exercise}\n\nUser ka answer:\n${text}\n\nTum Professor ho. Feedback do:\n1. Shabash ya improvement?\n2. Kya seekha?\n3. Next step kya?\n\nShort, impactful Hinglish mein feedback do!`;
+    
+    callProfessor([{role:'user',content:prompt}]).then(reply=>{
+      if(reply){
+        showProfessor(`*${lesson.title} — Feedback*\n\n${reply}`);
+        addXP(15);
+        state.completedLessons[modId]=(state.completedLessons[modId]||0)+1;
+        saveState();renderModules();
+        
+        if(state.currentLesson+1<LESSONS[modId].length){
+          showOptions(['✅ Next Lesson →'],()=>{startLesson(modId,state.currentLesson+1)});
+        }else{
+          showProfessor(`🎯 *Module Complete!* +50 XP bonus!`);
+          addXP(50);state.currentModule=null;saveState();renderModules();
+          showOptions(['🏠 Modules','💬 Free Chat'],(i)=>{
+            if(i===0){clearChat();showProfessor('Module select karo:');}
+            else{startFreeChat();}
+          });
+        }
       }
-    }else{
-      showProfessor(`*Thoda aur socho bhai...*\n\nAnswer short hai. Detail mein jao — situation, options, reasoning. Dobara try! 🔄\n\nHint: ${lesson.title} ke baare mein deeply socho.`);
-      state.awaitingAnswer=true;
-      document.getElementById('userInput').placeholder='Dobara try...';
-    }
-    document.getElementById('sendBtn').disabled=false;
-  },1200);
+      document.getElementById('sendBtn').disabled=false;
+    });
+    return;
+  }
+  
+  // Default: free chat
+  showUser(text);
+  callProfessor([{role:'user',content:text}]).then(reply=>{
+    if(reply)showProfessor(reply);
+  });
 }
 
-// Enter key handler
+function startFreeChat(){
+  state.chatMode=true;state.currentModule=null;state.intelMode=false;
+  document.getElementById('intelBtn').textContent='🌐 Intel';
+  clearChat();
+  showProfessor('💬 *Free Chat mode.*\n\nProfessor se kuch bhi poochh — strategy, life, business, ya koi bhi problem!\n\nModule select karne ke liye "🏠 Menu" likh do.');
+  state.awaitingAnswer=false;
+  renderModules();
+}
+
+// === INIT ===
 document.getElementById('userInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage()});
 
 // === INIT ===
 loadState();updateUI();renderModules();
-showProfessor('🎯 *El Profesor* ready.\n\nMain tera personal mindset coach hoon. Jo seekhega, woh tere sochne ka tareeqa badal dega.\n\n🔥 *Module select karo aur start karo!*\n\n🌐 *Naya:* Web Intel Agent — search karo internet pe training ke dauran.');
+showProfessor('🎯 *El Profesor* ready.\n\nMain tera personal mindset coach hoon. Real AI se powered!\n\n🔥 *Module select karo* ya 💬 *Chat* mein Professor se baat karo!\n\n🌐 *Intel* — internet search training ke dauran.');
 </script>
 </body>
 </html>
