@@ -145,5 +145,5 @@ def app(environ, start_response):
     if not file_path or path.endswith("/"):
         file_path = "index.html"
     clean_path = os.path.normpath(file_path).lstrip(os.sep)
-    full_path = Path(__file__).parent / clean_path
+    full_path = Path(__file__).parent.parent / clean_path
     return serve_file(start_response, full_path)
